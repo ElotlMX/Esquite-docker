@@ -8,7 +8,7 @@ RUN apt-get update
 RUN apt-get update
 RUN apt-get install -y git nginx python3 python3-pip vim net-tools htop whois sudo
 RUN useradd -m -s /bin/bash -d /home/elotl elotl
-RUN echo "elotl ALL=(ALL) NOPASSWD:ALL service nginx restart" >> /etc/sudoers
+RUN echo "elotl ALL=(ALL) NOPASSWD: /usr/sbin/service nginx restart" >> /etc/sudoers
 USER elotl 
 RUN cd /home/elotl && git clone https://github.com/ElotlMX/Esquite.git
 RUN cd /home/elotl/Esquite && pip3 install -r requirements.txt
