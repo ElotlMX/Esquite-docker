@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 echo -n "corpus-admin:" > /home/elotl/users.pwd; echo -n "$CFG_CORPUS_ADMIN_PASS" | mkpasswd -s -m sha-512 >> /home/elotl/users.pwd
-sudo service nginx restart
+sudo nginx
+cd /home/elotl/Esquite/
+git pull
 sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" /home/elotl/Esquite/env.yaml
 sed -i "s/L1:.*/L1: $CFG_L1/" /home/elotl/Esquite/env.yaml
 sed -i "s/L2:.*/L2: $CFG_L2/" /home/elotl/Esquite/env.yaml
