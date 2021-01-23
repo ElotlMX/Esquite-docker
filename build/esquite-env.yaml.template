@@ -40,6 +40,6 @@ SOCIAL:
   github: 'https://github.com/ElotlMX/'
   site: 'https://elotl.mx'
   twitter: 'https://twitter.com/elotlmx/'
-URL: http://ELASTIC_SEARCH:PORT/
+URL: http://esquite-elasticsearch:9200/
 META_DESC: Elotl Community public API for parallel corpora queries | API pública de Comunidad Elotl para búsquedas en corpus paralelos
 
