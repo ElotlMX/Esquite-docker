@@ -1,6 +1,7 @@
 #!/bin/sh
 LOGFILE="/data/app/esquite-init.log"
 ESQUITE_DIR="/data/app/Esquite"
+ESQUITE_DOCKER_DIR="/data/build"
 
 ##############################################################################  
 logMsg()                                                                        
@@ -38,6 +39,8 @@ fi
 
 logMsg "Setting permissions of Esquite directory ..."
 execCmd "sudo /bin/chown -R elotl:elotl /data/*"
+logMsg "Preparing ENV file template ..."
+execCmd "cp $ESQUITE_DOCKER_DIR/esquite-env.yaml.template $ESQUITE_DIR/env.yaml"
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
     logMsg "Setting new custom Corpus-admin password"
@@ -57,7 +60,15 @@ if [ ! -z "$CFG_INDEX" ]; then
     logMsg "Configuring VAR CFG_INDEX [$CFG_INDEX] ..."
     sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" $ESQUITE_DIR/env.yaml
 else
-    logMsg "Using Defalut INDEX ..."
+    logMsg "Using Defalut INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
+    execCmd "sleep 10"
+    elastic-test="`curl -X GET \"esquite-elasticsearch$:9200/esquite-production\"`"
+    if [ -z "$elastic_test" ]; then
+        logMsg "Default Index does not exist. Creating NEW index"
+        execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/esquite-production"
+    else
+        logMsg "Existing default index [esquite-production] exists."
+    fi
 fi
 if [ ! -z "$CFG_L1" ]; then
     logMsg "Configuring VAR CFG_L1 [$CFG_L1] ..."
@@ -137,6 +148,7 @@ if [ ! -z "$CFG_META_DESC" ]; then
 else
     logMsg "Using Defalut META_DESC ..."
 fi
+
 
 logMsg "Starting Esquite Framework ... "
 execCmd "cd $ESQUITE_DIR"
