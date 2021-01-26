@@ -93,6 +93,8 @@ if [ ! -z "$CFG_SECRET_KEY" ]; then
     sed -i "s/SECRET_KEY:.*/SECRET_KEY: $CFG_SECRET_KEY/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using NEW 'random' SECRET_KEY ..."
+    secret="`tr -dc A-Za-z0-9 </dev/urandom | head -c 69 ; echo ''`"
+    sed -i "s/ORG_SECRET_KEY:.*/ORG_SECRET_KEY: $CFG_SECRET_KEY/" $ESQUITE_DIR/env.yaml    
 fi
 if [ ! -z "$CFG_ORG_NAME" ]; then
     logMsg "Configuring VAR CFG_ORG_NAME [$CFG_ORG_NAME] ..."
