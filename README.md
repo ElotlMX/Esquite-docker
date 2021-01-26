@@ -16,7 +16,7 @@
 
 ```
 git clone https://github.com/ElotlMX/Esquite-docker.git
-./esquite-docker.sh 
+./esquite-docker.sh start
 ```
 And browse http://localhost
 
