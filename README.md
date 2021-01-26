@@ -18,7 +18,8 @@
 git clone https://github.com/ElotlMX/Esquite-docker.git
 ./esquite-docker.sh start
 ```
-And browse http://localhost
+- [EN] And browse http://localhost  (Default corpus-admin password is `elotl`. To change it please set the variable `CFG_CORPUS_ADMIN_PASS=elotl` on file `docker-compose.yml`)
+- [ES] Navegar en http://localhost  (El password default de corpus-admin es `elotl`. Para cambiarlo hay que definit la variable `CFG_CORPUS_ADMIN_PASS=elotl` en el archivo `docker-compose.yml`
 
 ## Options | Opciones
 ```
