@@ -1,24 +1,37 @@
 # Docker Image - Esquite Framework
 
-## v0.1
-- Esquite Core components
-- External Elasticseach needed via ENV variable
-- `TODO`: Buil-in elasticsearch
-### Usage:
+## v0.2
+- Esquite All-in-one container | Todos los componentes de Esquite en un container único
+- Startup script with multi-language support (English|Spanish|Nahuatl*) for startup options
+- Smaller Docker image (Linux Alpine based)
+
+### Usage | Uso:
+
+## Quick Start
+
 ```
 git clone https://github.com/ElotlMX/Esquite-docker.git
-cd Esquite-docker
+./esquite-docker.sh 
 ```
-- Configure ENV vars in docker compose. 
-- *Mandatory* parameters in `v0.1` : URL of a Elasticsearch API (`CFG_URL`)  and existing INDEX name  (`CFG_INDEX`)
+And browse http://localhost
 
-- Start up with docker-compose
+## Options
+```
+./esquite-docker.sh 
+
+##############################################
+ Esquite Docker script   - Comunidad ElotlMX
+----------------------------------------------
+ Github: https:///github.com/elotlmx
+ Web   : Elotl.mx
+##############################################
+
+
+[EN ] ERROR: Unknown Option: Syntax:    ./esquite-docker (start|stop|restart|destroy|info|update|recreate)
+[ES ] ERROR: Opción no valida. Sintaxis:    ./esquite-docker (iniciar|detener|reiniciar|destruir|info|actualizar|recrear)
+[NAH] TLATLACOLLI: Opción no valida. Sintaxis:    ./esquite-docker (pehualtia|cahua|re-pehualtia|tlapoloa|tlanonotzaliztli|yancuic|tlaana)
 
 ```
-docker-compose up -d
-```
-
-- Browse  `http://CONTAINER_IP`
 
 
 
