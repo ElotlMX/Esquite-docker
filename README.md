@@ -14,12 +14,34 @@
 
 ## Quick Start | Inicio Rápido
 
+### Requirements | Requerimientos
+
+If `Docker` is NOT installed | Si `Docker` NO esta instalado:
+```
+curl -sSL htps://get.docker.com | sh
+pip3 install docker-compose
+```
+
+### Using esquite-docker startup script | Usando archivo de inicialización esquite-docker
 ```
 git clone https://github.com/ElotlMX/Esquite-docker.git
-./esquite-docker.sh start
+cd Esquite-docker
+sudo ./esquite-docker.sh start
 ```
+
+### Using docker-compose directly
+```
+git clone https://github.com/ElotlMX/Esquite-docker.git
+cd Esquite-docker
+sudo docker-compose up -d
+```
+
 - [EN] And browse http://localhost  (Default corpus-admin password is `elotl`. To change it please set the variable `CFG_CORPUS_ADMIN_PASS=elotl` on file `docker-compose.yml`)
 - [ES] Navegar en http://localhost  (El password default de corpus-admin es `elotl`. Para cambiarlo hay que definit la variable `CFG_CORPUS_ADMIN_PASS=elotl` en el archivo `docker-compose.yml`
+
+### Notes:
+- [ES] `sudo` es necesario ya que por default `Docker` necesita permisos de `root` para crear nuevos container. Sin embargo esto se puede cambiar si se le asigna a un usuario específico permisos para ejecturar `Docker`.
+- [EN] `sudo` is needed because by default `Docker` needs `root` permissions to create new containers. However, this can be changed if permissions to execute `Docker` are assigned to a specific user.
 
 ## Options | Opciones
 ```
