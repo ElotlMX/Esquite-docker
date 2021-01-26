@@ -1,0 +1,57 @@
+version: '3.1'
+
+# Docker compose File for Esquite-docker v0.1
+
+services:
+  app:
+    image: elotlmx/esquite
+    hostname: esquite-app
+    restart: unless-stopped
+    volumes:
+      - ./volumes/app/:/data
+      - ./build/:/data/build
+      - ./build/entrypoint.sh:/data/entrypoint.sh
+    environment:
+      - CFG_CORPUS_ADMIN_PASS=elotl # Change admin password
+      # CFG_UPDATE option will update Esquite whenever the container is
+      # restarted. This will happen only if there is a new Esquite version
+      # available on Github. 
+      # ** WARNING **: If any of the Esquite core files is modified, this
+      # option may overwrite your local changes. Use with caution.
+      #- CFG_UPDATE_ON_BOOT=YES
+      - CFG_L1=Espanol
+      - CFG_L2=Otomi
+      - CFG_NAME=ElotlTESTX
+      - CFG_ORG_NAME=ElotlTestAAA
+      - CFG_SECRET_KEY=RRxGMmjXRJIjxdQaMW7xleI4JDU9qyepAbz5EECbIxgYtj0N0LyBAJlmergYeJ4xAEib
+      - CFG_BLOG=https://elotl.mx/blog/
+      - CFG_EMAIL=contacto@elotl.mx
+      - CFG_FACEBOOK=https://www.facebook.com/comunidadelotl
+      - CFG_SITE=https://elotl.mx
+      - CFG_TWITTER=https://twitter.com/elotlmx/
+      - CFG_META_DESC=Esquite Framework | Corpus Paralelos
+      - CFG_GOOGLE_ANALYTICS=UA-134850250-1
+      #- CFG_URL=http://HOST:PORT  # ElasticSearch URL
+      #- CFG_INDEX=tsunkua-production   # Default index name
+
+  web:
+    image: nginx
+    hostname: esquite-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - "app"
+    volumes:
+      - ./volumes/app/:/data
+      - ./logs/nginx/:/var/log/nginx/
+      - ./build/esquite-nginx.conf.template:/etc/nginx/conf.d/default.conf
+
+  elasticsearch:
+    image: elasticsearch:7.10.1
+    hostname: esquite-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+    depends_on:
+      - "app"
