@@ -19,8 +19,24 @@
 If `Docker` is NOT installed | Si `Docker` NO esta instalado:
 ```
 curl -sSL htps://get.docker.com | sh
+sudo service docker start
 pip3 install docker-compose
 ```
+Additionally, Elasticsearch needs the following configuration in production | Adicionalmente Elasticsearch necesita la siguiente configuración en producción:
+
+The `vm.max_map_count` setting should be `262144`
+
+To apply the setting on a live system | Para aplicarlo temporalmente
+```
+sysctl -w vm.max_map_count=262144
+```
+To set permanently | Para modificarlo permanentemente:
+
+Change the value in `/etc/sysctl.conf`
+```
+vm.max_map_count=262144
+```
+
 
 ### Using esquite-docker startup script | Usando archivo de inicialización esquite-docker
 ```
@@ -74,3 +90,4 @@ sudo docker-compose up -d
 ### Actualización de versión de Esquite | Esquite version Updates
 - [ES] Se puede habilitar la actualización de Esquite cada vez que se reincie el container activando la opción `CFG_UPDATE_ON_BOOT` o manualmente por medio de las opociones `update` o `actualizar` o `tlanonotzaliztli` con el script `./esquite-docker.sh`
 - [EN] It is possible to enable automatic update on each container restart by enabling the option `CFG_UPDATE_ON_BOOT` or manually by using any of the options `update` or `actualizar` or `tlanonotzaliztli` with the startup script `./esquite-docker.sh` 
+
