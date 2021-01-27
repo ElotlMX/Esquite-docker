@@ -35,12 +35,11 @@ fi
 if [ ! -d "$ESQUITE_DIR/" ]; then
     logMsg "Copying Prebuilt Esquite Dir /home/elotl/Esquite/ to /data/app"
     execCmd "cp -rp /home/elotl/Esquite /data/app/"
+    logMsg "Setting permissions of Esquite directory ..."
+    execCmd "sudo /bin/chown -R elotl /data/*"
+    logMsg "Preparing ENV file template ..."
+    execCmd "cp $ESQUITE_DOCKER_DIR/esquite-env.yaml.template $ESQUITE_DIR/env.yaml"
 fi
-
-logMsg "Setting permissions of Esquite directory ..."
-execCmd "sudo /bin/chown -R elotl:elotl /data/*"
-logMsg "Preparing ENV file template ..."
-execCmd "cp $ESQUITE_DOCKER_DIR/esquite-env.yaml.template $ESQUITE_DIR/env.yaml"
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
     logMsg "Setting new custom Corpus-admin password"
