@@ -32,6 +32,7 @@ if [ ! -d "/data/app/" ]; then
     logMsg "Directory /data/app does not exist. Creating new directory ..."
     execCmd "sudo /bin/mkdir /data/app"
 fi
+envupdate=0
 if [ ! -d "$ESQUITE_DIR/" ]; then
     logMsg "Copying Prebuilt Esquite Dir /home/elotl/Esquite/ to /data/app"
     execCmd "cp -rp /home/elotl/Esquite /data/app/"
@@ -39,6 +40,7 @@ if [ ! -d "$ESQUITE_DIR/" ]; then
     execCmd "sudo /bin/chown -R elotl /data/*"
     logMsg "Preparing ENV file template ..."
     execCmd "cp $ESQUITE_DOCKER_DIR/esquite-env.yaml.template $ESQUITE_DIR/env.yaml"
+    envupdate=1
 fi
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
@@ -69,25 +71,25 @@ else
         logMsg "Existing default index [esquite-production] exists."
     fi
 fi
-if [ ! -z "$CFG_L1" ]; then
+if [ ! -z "$CFG_L1" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_L1 [$CFG_L1] ..."
     sed -i "s/L1:.*/L1: $CFG_L1/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut L1 ..."
 fi
-if [ ! -z "$CFG_L2" ]; then
+if [ ! -z "$CFG_L2" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_L2 [$CFG_L2] ..."
     sed -i "s/L2:.*/L2: $CFG_L2/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut L2 ..."
 fi
-if [ ! -z "$CFG_URL" ]; then
+if [ ! -z "$CFG_URL" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_URL [$CFG_URL] ..."
     sed -i "s,URL:.*,URL: $CFG_URL," $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Default Elasticsearch URL ..."
 fi
-if [ ! -z "$CFG_SECRET_KEY" ]; then
+if [ ! -z "$CFG_SECRET_KEY" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_SECRET_KEY [$CFG_SECRET_KEY] ..."
     sed -i "s/SECRET_KEY:.*/SECRET_KEY: $CFG_SECRET_KEY/" $ESQUITE_DIR/env.yaml
 else
@@ -95,55 +97,55 @@ else
     secret="`tr -dc A-Za-z0-9 </dev/urandom | head -c 69 ; echo ''`"
     sed -i "s/ORG_SECRET_KEY:.*/ORG_SECRET_KEY: $CFG_SECRET_KEY/" $ESQUITE_DIR/env.yaml    
 fi
-if [ ! -z "$CFG_ORG_NAME" ]; then
+if [ ! -z "$CFG_ORG_NAME" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_ORG_NAME [$CFG_ORG_NAME] ..."
     sed -i "s/ORG_NAME:.*/ORG_NAME: $CFG_ORG_NAME/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut ORG_NAME ..."
 fi
-if [ ! -z "$CFG_GOOGLE_ANALYTICS" ]; then
+if [ ! -z "$CFG_GOOGLE_ANALYTICS" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_GOOGLE_ANALYTICS [$CFG_GOOGLE_ANALYTICS] ..."
     sed -i "s/GOOGLE_ANALYTICS:.*/GOOGLE_ANALYTICS: $CFG_GOOGLE_ANALYTICS/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut GOOGLE_ANALYTICS ..."
 fi
-if [ ! -z "$CFG_NAME" ]; then
+if [ ! -z "$CFG_NAME" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_NAME [$CFG_NAME] ..."
     sed -i "s/NAME:.*/NAME: $CFG_NAME/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut Esquite NAME ..."
 fi
-if [ ! -z "$CFG_BLOG" ]; then
+if [ ! -z "$CFG_BLOG" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_BLOG [$CFG_BLOG] ..."
     sed -i "s,blog:.*,blog: $CFG_BLOG," $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut BLOG url ..."
 fi
-if [ ! -z "$CFG_EMAIL" ]; then
+if [ ! -z "$CFG_EMAIL" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_EMAIL [$CFG_EMAIL] ..."
     sed -i "s/email:.*/email: $CFG_EMAIL/" $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut EMAIL address ..."
 fi
-if [ ! -z "$CFG_FACEBOOK" ]; then
+if [ ! -z "$CFG_FACEBOOK" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_FACEBOOK [$CFG_FACEBOOK] ..."
     sed -i "s,facebook:.*,facebook: $CFG_FACEBOOK," $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut FACEBOOK url ..."
 fi
-if [ ! -z "$CFG_SITE" ]; then
+if [ ! -z "$CFG_SITE" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_SITE [$CFG_SITE] ..."
     sed -i "s,site:.*,site: $CFG_SITE," $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut SITE url ..."
 fi
-if [ ! -z "$CFG_TWITTER" ]; then
+if [ ! -z "$CFG_TWITTER" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_TWITTER [$CFG_TWITTER] ..."
     sed -i "s,twitter:.*,twitter: $CFG_TWITTER," $ESQUITE_DIR/env.yaml
 else
     logMsg "Using Defalut TWITTER url ..."
 fi
-if [ ! -z "$CFG_META_DESC" ]; then
+if [ ! -z "$CFG_META_DESC" ] && [ $envupdate -eq 1 ]; then
     logMsg "Configuring VAR CFG_META_DESC [$CFG_META_DESC] ..."
     sed -i "s/META_DESC:.*/META_DESC: $CFG_META_DESC/" $ESQUITE_DIR/env.yaml
 else
