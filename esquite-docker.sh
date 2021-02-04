@@ -93,6 +93,12 @@ info () {
 }
 
 start () {
+    CWD=`pwd`
+    if [ ! -f "$CWD/logs/esquite-docker.log" ]; then 
+        echo "Creating docker log file for consistency ..."
+        mkdir "$CWD/logs"
+        touch "$CWD/logs/esquite-docker.log"
+    fi
     docker-compose up -d
     sleep 5
     get_info
@@ -185,7 +191,7 @@ update () {
     read update
     if [ $update == "Yes" ] || [ $update == "Si" ] || [ $update == "Quemah" ] ; then
         echo "(Updating | Actualizando) via GIT ..."
-        docker exec -ti $cnt_name_app sh -c "cd /data/app/Esquite && git pull --rebase"
+        docker exec -ti $cnt_name_app sh -c "cd /home/elotl/Esquite && git pull --rebase"
         restart "app"
     else
         echo "[EN] Update confirmation unsuccesful. No updates have been applied"

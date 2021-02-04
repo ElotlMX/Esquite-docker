@@ -4,13 +4,17 @@ version: '3.1'
 
 services:
   app:
-    image: elotlmx/esquite
+    image: esquite-dev
     hostname: esquite-app
     restart: unless-stopped
+    ports:
+      - "80:80"
     volumes:
-      - ./volumes/app/:/data
-      - ./build/:/data/build
-      - ./build/entrypoint.sh:/data/entrypoint.sh
+      - ${PWD}/logs/esquite-docker.log:/home/elotl/esquite-docker.log
+      - ${PWD}/logs/nginx:/var/log/nginx
+      - ${PWD}/build:/home/elotl/Esquite-docker/build
+      - ${PWD}/build/entrypoint.sh:/entrypoint-esquite.sh
+      - ${PWD}/build/esquite-nginx.conf.template:/etc/nginx/conf.d/default.conf
     environment:
       - CFG_CORPUS_ADMIN_PASS=elotl # Change admin password
       # CFG_UPDATE option will update Esquite whenever the container is
@@ -34,18 +38,6 @@ services:
       #- CFG_URL=http://HOST:PORT  # ElasticSearch URL
       #- CFG_INDEX=tsunkua-production   # Default index name
 
-  web:
-    image: nginx
-    hostname: esquite-web
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - "app"
-    volumes:
-      - ./volumes/app/:/data
-      - ./logs/nginx/:/var/log/nginx/
-      - ./build/esquite-nginx.conf.template:/etc/nginx/conf.d/default.conf
 
   elasticsearch:
     image: elasticsearch:7.10.1

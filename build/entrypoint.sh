@@ -1,7 +1,8 @@
 #!/bin/sh
-LOGFILE="/data/app/esquite-init.log"
-ESQUITE_DIR="/data/app/Esquite"
-ESQUITE_DOCKER_DIR="/data/build"
+HOMEDIR="/home/elotl"
+LOGFILE="$HOMEDIR/esquite-docker.log"
+ESQUITE_DIR="$HOMEDIR/Esquite"
+ESQUITE_DOCKER_DIR="$HOMEDIR/Esquite-docker/build"
 
 ##############################################################################  
 logMsg()                                                                        
@@ -25,35 +26,29 @@ execCmd()
 }                                                                               
 ##############################################################################
 
+execCmd "sudo /bin/chown -R elotl:elotl $HOMEDIR/"
+logMsg "Permissions set to homedir (ensure perms in case volumes are used) ..."
 logMsg "############################################################"
 logMsg "########### Starting Esquite Docker container    ###########"
-
-if [ ! -d "/data/app/" ]; then
-    logMsg "Directory /data/app does not exist. Creating new directory ..."
-    execCmd "sudo /bin/mkdir /data/app"
-fi
 envupdate=0
-if [ ! -d "$ESQUITE_DIR/" ]; then
-    logMsg "Copying Prebuilt Esquite Dir /home/elotl/Esquite/ to /data/app"
-    execCmd "cp -rp /home/elotl/Esquite /data/app/"
-    logMsg "Setting permissions of Esquite directory ..."
-    execCmd "sudo /bin/chown -R elotl /data/*"
-    logMsg "Preparing ENV file template ..."
-    execCmd "cp $ESQUITE_DOCKER_DIR/esquite-env.yaml.template $ESQUITE_DIR/env.yaml"
+envdiff="`diff $ESQUITE_DIR/env.yaml $ESQUITE_DOCKER_DIR/esquite-env.yaml.template`"
+if [ -z "$envdiff" ]; then
+    logMsg "Empty template. Esquite env.yaml will use docker-compose VARS ..."
     envupdate=1
 fi
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
     logMsg "Setting new custom Corpus-admin password"
-    echo -n "corpus-admin:" > /data/app/users.pwd; echo -n "$CFG_CORPUS_ADMIN_PASS" | mkpasswd -s -m sha-512 >> /data/app/users.pwd
+    echo -n "corpus-admin:" > $HOMEDIR/users.pwd; echo -n "$CFG_CORPUS_ADMIN_PASS" | mkpasswd -s -m sha-512 >> $HOMEDIR/users.pwd
 else
     logMsg "Using default password for corpus-admin"
-    echo -n "corpus-admin:" > /data/app/users.pwd; echo -n "elotl" | mkpasswd -s -m sha-512 >> /data/app/users.pwd
+    echo -n "corpus-admin:" > $HOMEDIR/users.pwd; echo -n "elotl" | mkpasswd -s -m sha-512 >> $HOMEDIR/users.pwd
 fi
 if [ "$CFG_UPDATE_ON_BOOT" = "YES" ]; then
     logMsg "Update VAR enabled. Updating Esquite GIT repository ..."
     execCmd "cd $ESQUITE_DIR/"
     execCmd "git pull"
+    execCmd "pip3 install -r requirements.txt"
 else
     logMsg "Skipping Update on BOOT. To update enable VAR CFG_UPDATE_ON_BOOT=YES ..."
 fi
@@ -63,7 +58,7 @@ if [ ! -z "$CFG_INDEX" ]; then
 else
     logMsg "Using Defalut INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
     execCmd "sleep 10"
-    elastic-test="`curl -X GET \"esquite-elasticsearch$:9200/esquite-production\"`"
+    elastic-test="`curl -X GET \"esquite-elasticsearch:9200/esquite-production\"`"
     if [ -z "$elastic_test" ]; then
         logMsg "Default Index does not exist. Creating NEW index"
         execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/esquite-production"
@@ -154,6 +149,8 @@ if [ $envupdate -eq 1 ]; then
     fi
 fi
 
+logMsg "Starting NGINX server ..."
+execCmd "sudo nginx"
 logMsg "Starting Esquite Framework ... "
 execCmd "cd $ESQUITE_DIR"
 execCmd "python3 manage.py migrate"
