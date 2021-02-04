@@ -4,7 +4,7 @@ version: '3.1'
 
 services:
   app:
-    image: esquite-dev
+    image: elotlmx/esquite
     hostname: esquite-app
     restart: unless-stopped
     ports:
