@@ -18,7 +18,7 @@
 
 If `Docker` is NOT installed | Si `Docker` NO esta instalado:
 ```
-curl -sSL htps://get.docker.com | sh
+curl -sSL https://get.docker.com | sh
 sudo service docker start
 pip3 install docker-compose
 ```
