@@ -149,8 +149,23 @@ if [ $envupdate -eq 1 ]; then
     fi
 fi
 
+#############################################################################
+# Starting built-in Nginx server. Do not change this unless you want to
+# change the webserver used as reverse proxy for Esquite framework
 logMsg "Starting NGINX server ..."
 execCmd "sudo nginx"
+
+#############################################################################
+# Add here custom services/apps to be started during container startup
+# Note: If service needs root permissions, change first default sudoers config
+
+# Example
+#execCmd "sudo /opt/myapp/app"
+
+
+#############################################################################
+# Start of Esquite framework backend
+
 logMsg "Starting Esquite Framework ... "
 execCmd "cd $ESQUITE_DIR"
 execCmd "python3 manage.py migrate"
