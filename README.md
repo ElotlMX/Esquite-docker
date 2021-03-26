@@ -40,14 +40,14 @@ vm.max_map_count=262144
 
 ### Using esquite-docker startup script | Usando archivo de inicialización esquite-docker
 ```
-git clone https://github.com/ElotlMX/Esquite-docker.git
+git clone --recursive https://github.com/ElotlMX/Esquite-docker.git
 cd Esquite-docker
 sudo ./esquite-docker.sh start
 ```
 
 ### Using docker-compose directly
 ```
-git clone https://github.com/ElotlMX/Esquite-docker.git
+git clone --recursive https://github.com/ElotlMX/Esquite-docker.git
 cd Esquite-docker
 sudo docker-compose up -d
 ```
