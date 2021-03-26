@@ -47,8 +47,7 @@ fi
 if [ "$CFG_UPDATE_ON_BOOT" = "YES" ]; then
     logMsg "Update VAR enabled. Updating Esquite GIT repository ..."
     execCmd "cd $ESQUITE_DIR/"
-    execCmd "git pull --recurse-submodules"
-    execCmd "git submodule update --remote"
+    execCmd "git pull"
     execCmd "pip3 install -r requirements.txt"
 else
     logMsg "Skipping Update on BOOT. To update enable VAR CFG_UPDATE_ON_BOOT=YES ..."
