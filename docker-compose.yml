@@ -10,6 +10,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      - ${PWD}/Esquite:/home/elotl/Esquite
       - ${PWD}/logs/esquite-docker.log:/home/elotl/esquite-docker.log
       - ${PWD}/logs/nginx:/var/log/nginx
       - ${PWD}/build:/home/elotl/Esquite-docker/build
