@@ -25,11 +25,11 @@ execCmd()
     fi                                                                          
 }                                                                               
 ##############################################################################
-
+logMsg "############################################################"
+logMsg "Starting Docker-Esquite"
+logMsg "############################################################"
 execCmd "sudo /bin/chown -R elotl:elotl $HOMEDIR/"
 logMsg "Permissions set to homedir (ensure perms in case volumes are used) ..."
-logMsg "############################################################"
-logMsg "########### Starting Esquite Docker container    ###########"
 envupdate=0
 envdiff="`diff $ESQUITE_DIR/env.yaml $ESQUITE_DOCKER_DIR/esquite-env.yaml.template`"
 if [ -z "$envdiff" ]; then
@@ -47,26 +47,35 @@ fi
 if [ "$CFG_UPDATE_ON_BOOT" = "YES" ]; then
     logMsg "Update VAR enabled. Updating Esquite GIT repository ..."
     execCmd "cd $ESQUITE_DIR/"
-    execCmd "git pull"
+    execCmd "git pull --recurse-submodules"
+    execCmd "git submodule update --remote"
     execCmd "pip3 install -r requirements.txt"
 else
     logMsg "Skipping Update on BOOT. To update enable VAR CFG_UPDATE_ON_BOOT=YES ..."
 fi
-if [ ! -z "$CFG_INDEX" ]; then
-    logMsg "Configuring VAR CFG_INDEX [$CFG_INDEX] ..."
-    sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" $ESQUITE_DIR/env.yaml
-else
-    logMsg "Using Defalut INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
-    execCmd "sleep 10"
-    elastic-test="`curl -X GET \"esquite-elasticsearch:9200/esquite-production\"`"
-    if [ -z "$elastic_test" ]; then
-        logMsg "Default Index does not exist. Creating NEW index"
-        execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/esquite-production"
-    else
-        logMsg "Existing default index [esquite-production] exists."
-    fi
-fi
+
+logMsg "ENV update=$envupdate"
 if [ $envupdate -eq 1 ]; then
+    logMsg "Initiliazing ENV via wizard (quick start)"
+    execCmd "cd $ESQUITE_DIR"
+    execCmd "pip3 install -r requirements.txt"
+    execCmd "python3 wizard.py -q"
+
+    if [ ! -z "$CFG_INDEX" ]; then
+        logMsg "Configuring VAR CFG_INDEX [$CFG_INDEX] ..."
+        sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" $ESQUITE_DIR/env.yaml
+    else
+        logMsg "Using Default INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
+        execCmd "sleep 10"
+        elastic-test="`curl -X GET \"esquite-elasticsearch:9200/default\"`"
+        if [ -z "$elastic_test" ]; then
+            logMsg "Default Index does not exist. Creating NEW index"
+            execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/default"
+        else
+            logMsg "Existing default index [default] exists."
+        fi
+    fi
+
     if [ ! -z "$CFG_L1" ]; then
         logMsg "Configuring VAR CFG_L1 [$CFG_L1] ..."
         sed -i "s/L1:.*/L1: $CFG_L1/" $ESQUITE_DIR/env.yaml
@@ -147,6 +156,9 @@ if [ $envupdate -eq 1 ]; then
     else
         logMsg "Using Defalut META_DESC ..."
     fi
+    execCmd "cd $ESQUITE_DIR"
+    execCmd "pip3 install -r requirements.txt"
+    exit
 fi
 
 #############################################################################
@@ -168,5 +180,6 @@ execCmd "sudo nginx"
 
 logMsg "Starting Esquite Framework ... "
 execCmd "cd $ESQUITE_DIR"
+execCmd "pip3 install -r requirements.txt"
 execCmd "python3 manage.py migrate"
 execCmd "python3 manage.py runserver 0.0.0.0:3000"

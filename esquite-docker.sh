@@ -2,15 +2,10 @@
 # Esquite Basic Controller script v0.1
 # contacto@elotl.mx
 get_info () {
-    cnt_base_web="`pwd | sed -r 's/.*\/([^\/]+)$/\1/' | tr '[:upper:]' '[:lower:]'`_web_"
     cnt_base_app="`pwd | sed -r 's/.*\/([^\/]+)$/\1/' | tr '[:upper:]' '[:lower:]'`_app_"
     cnt_base_els="`pwd | sed -r 's/.*\/([^\/]+)$/\1/' | tr '[:upper:]' '[:lower:]'`_elasticsearch_"
-    cnt_name_web="`docker ps -a | grep -o "$cnt_base_web.*"`"
     cnt_name_app="`docker ps -a | grep -o "$cnt_base_app.*"`"
     cnt_name_els="`docker ps -a | grep -o "$cnt_base_els.*"`"
-    if [ ! -z "$cnt_name_web" ]; then
-        cnt_ip_web="`docker inspect $cnt_name_web | egrep  'IPAddress.*[0-9]+\.'| grep -o '[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*'`"
-    fi
     if [ ! -z "$cnt_name_app" ]; then
         cnt_ip_app="`docker inspect $cnt_name_app | egrep  'IPAddress.*[0-9]+\.'| grep -o '[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*'`"
     fi
@@ -22,21 +17,18 @@ get_info () {
 destroy_cnt () {
     if [ $2 == "es" ]; then
         echo "En verdad desea $1 el siguiente container ?"
-        echo "  Esquite Web           -> $cnt_name_web"
         echo "  Esquite App           -> $cnt_name_app"
         echo "  Esquite Elasticsearch -> $cnt_name_els"
         echo
         echo -n "Escriba \"Si\" para confirmar : "
     elif [ $2 == "en" ]; then
         echo "Do you really want to $1 the following Containers ?"
-        echo "  Esquite Web           -> $cnt_name_web"
         echo "  Esquite App           -> $cnt_name_app"
         echo "  Esquite Elasticsearch -> $cnt_name_els"
         echo
         echo -n "Type \"Yes\" to confirm : "
     elif [ $2 == "na" ]; then
         echo "Nahuatl pendiente: :(. En verdad desea  $1 los containers?"
-        echo "  Esquite Web           -> $cnt_name_web"
         echo "  Esquite App           -> $cnt_name_app"
         echo "  Esquite Elasticsearch -> $cnt_name_els"
         echo
@@ -44,12 +36,6 @@ destroy_cnt () {
     fi 
     read destroy
     if [ $destroy == "Yes" ] || [ $destroy == "Si" ] || [ $destroy == "Quemah" ]; then
-        if [ -z "$cnt_name_web" ]; then
-            echo "Esquite WEB container:  [Does not exist | No existe | Amo catl]"
-        else
-            echo "Container [$cnt_name_web]  [Destroying | Destruyendo | Tlapoloa] ..." 
-            docker rm -f $cnt_name_web
-        fi
         if [ -z "$cnt_name_app" ]; then
             echo "Esquite APP container: [Does not exist | No existe | Amo catl]"
         else
@@ -75,11 +61,6 @@ destroy_cnt () {
 }
 
 info () {
-    if [ -z "$cnt_name_web" ]; then
-        echo "Esquite WEB container: [Does not exist | No existe | Amo catl]"
-    else
-        echo "Esquite WEB           : [$cnt_ip_web]-[$cnt_name_web]"
-    fi
     if [ -z "$cnt_name_app" ]; then
         echo "Esquite APP container: [Does not exist | No existe | Amo catl]"
     else
@@ -102,16 +83,15 @@ start () {
     docker-compose up -d
     sleep 5
     get_info
-    restart "app"
     get_info
     info
     echo
     echo "##############################################################################"
     echo "                     <ESQUITE>  Comunidad ElotlMX"
     echo
-    echo "[EN] You can access Esquite Web [$cnt_name_web] on http://$cnt_ip_web"
-    echo "[ES] Puedes acceder a Esquite Web [$cnt_name_web] en http://$cnt_ip_web"
-    echo "[NA] Calaqui Esquite Web [$cnt_name_web]  http://$cnt_ip_web"
+    echo "[EN] You can access Esquite Web [$cnt_name_app] on http://$cnt_ip_app"
+    echo "[ES] Puedes acceder a Esquite Web [$cnt_name_app] en http://$cnt_ip_app"
+    echo "[NA] Calaqui Esquite Web [$cnt_name_app]  http://$cnt_ip_app"
     echo
     echo "[EN] If Any port was exposed in the docker-compose file, you can access Esquite on:"
     echo "[ES] Si algún puerto fue expuesto en el archivo docker-compose, puede acceder en:"
@@ -123,11 +103,6 @@ start () {
 }
 
 stop () {
-    if [ -z "$cnt_name_web" ]; then
-        echo "Esquite WEB container: [Does not exist | No existe | Amo catl]"
-    else
-        echo "Container [$cnt_name_web] [Stopping | Deteniendo | Cahua ] ..." && docker stop $cnt_name_web
-    fi
     if [ -z "$cnt_name_app" ]; then
         echo "Esquite APP container: [Does not exist | No existe | Amo catl]"
     else
@@ -146,13 +121,6 @@ restart() {
             echo "Esquite ELASTICSEARCH container: [Does not exist | No existe | Amo catl]"
         else
             echo "Container [$cnt_name_els] [Restarting | Reiniciando | Re-pehualtia] ..." && docker restart $cnt_name_els
-        fi
-    fi
-    if [ "$1" == "web" ] || [ "$1" == "all" ]; then
-        if [ -z "$cnt_name_web" ]; then
-            echo "Esquite WEB container: [Does not exist | No existe | Amo catl]"
-        else
-            echo "Container [$cnt_name_web] [Restarting | Reiniciando | Re-pehualtia] ..." && docker restart $cnt_name_web
         fi
     fi
     if [ "$1" == "app" ] || [ "$1" == "all" ]; then
@@ -191,7 +159,8 @@ update () {
     read update
     if [ $update == "Yes" ] || [ $update == "Si" ] || [ $update == "Quemah" ] ; then
         echo "(Updating | Actualizando) via GIT ..."
-        docker exec -ti $cnt_name_app sh -c "cd /home/elotl/Esquite && git pull --rebase"
+        git pull --recurse-submodules
+        git submodule update --remote
         restart "app"
     else
         echo "[EN] Update confirmation unsuccesful. No updates have been applied"
