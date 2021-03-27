@@ -25,17 +25,33 @@ execCmd()
     fi                                                                          
 }                                                                               
 ##############################################################################
+sudo /bin/chown -R elotl:elotl $HOMEDIR
 logMsg "############################################################"
 logMsg "Starting Docker-Esquite"
 logMsg "############################################################"
 execCmd "sudo /bin/chown -R elotl:elotl $HOMEDIR/"
 logMsg "Permissions set to homedir (ensure perms in case volumes are used) ..."
 envupdate=0
-envdiff="`diff $ESQUITE_DIR/env.yaml $ESQUITE_DOCKER_DIR/esquite-env.yaml.template`"
-if [ -z "$envdiff" ]; then
-    logMsg "Empty template. Esquite env.yaml will use docker-compose VARS ..."
+if [ ! -f $ESQUITE_DIR/env.yaml ]; then
+    logMsg "ENV file doesn't exist. New file will be created via wizard (quick)"
+    execCmd "cd $ESQUITE_DIR/"
+    execCmd "pip3 install -r requirements.txt"
+    execCmd "python3 wizard.py -q"
+    if [ ! -z "$CFG_INDEX" ]; then
+        logMsg "Configuring VAR CFG_INDEX [$CFG_INDEX] ..."
+        sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" $ESQUITE_DIR/env.yaml
+    fi
     envupdate=1
 fi
+    logMsg "Testin Default INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
+    execCmd "sleep 10"
+    elastic-test="`curl -X GET \"esquite-elasticsearch:9200/default\"`"
+    if [ -z "$elastic_test" ]; then
+        logMsg "Default Index does not exist. Creating NEW index"
+        execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/default"
+    else
+        logMsg "Existing default index [default] exists."
+    fi
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
     logMsg "Setting new custom Corpus-admin password"
@@ -55,11 +71,6 @@ fi
 
 logMsg "ENV update=$envupdate"
 if [ $envupdate -eq 1 ]; then
-    logMsg "Initiliazing ENV via wizard (quick start)"
-    execCmd "cd $ESQUITE_DIR"
-    execCmd "pip3 install -r requirements.txt"
-    execCmd "python3 wizard.py -q"
-
     if [ ! -z "$CFG_INDEX" ]; then
         logMsg "Configuring VAR CFG_INDEX [$CFG_INDEX] ..."
         sed -i "s/INDEX:.*/INDEX: $CFG_INDEX/" $ESQUITE_DIR/env.yaml

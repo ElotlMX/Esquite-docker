@@ -11,8 +11,11 @@ RUN echo "elotl:elotl" | chpasswd
 USER elotl 
 RUN cd /home/elotl && git clone https://github.com/ElotlMX/Esquite.git
 RUN cd /home/elotl/Esquite && pip3 install -r requirements.txt
+RUN cd /home/elotl/Esquite && python3 wizard.py -q
+RUN cd /home/elotl/Esquite && python3 manage.py collectstatic 
+RUN mv /home/elotl/Esquite/site/assets/admin /home/elotl/Esquite/static/
+RUN mv /home/elotl/Esquite/site/assets/rest_framework /home/elotl/Esquite/static/
 RUN cd /home/elotl && git clone https://github.com/ElotlMX/Esquite-docker.git
-RUN cp /home/elotl/Esquite-docker/build/esquite-env.yaml.template /home/elotl/Esquite/env.yaml
 
 USER root
 RUN cp /home/elotl/Esquite-docker/build/entrypoint.sh /entrypoint-esquite.sh
