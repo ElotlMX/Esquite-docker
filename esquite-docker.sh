@@ -96,7 +96,12 @@ start () {
     echo "[EN] If Any port was exposed in the docker-compose file, you can access Esquite on:"
     echo "[ES] Si algún puerto fue expuesto en el archivo docker-compose, puede acceder en:"
     echo
-    echo "     > http://localhost:PORT       -->   By default: http://localhost"
+    echo "     > Web Frontend  : http://localhost:PORT  -->   By default: http://localhost"
+    echo "     > Corpus Admin  :  http://localhost/corpus-admin"
+    echo
+    echo "     > Use Default login if no config defined in docker-compose file"
+    echo "       - Default User : 'corpus-admin'"
+    echo "       - Default Pass : 'elotl'"
     echo
     echo "##############################################################################"
     echo
@@ -158,9 +163,10 @@ update () {
     fi
     read update
     if [ $update == "Yes" ] || [ $update == "Si" ] || [ $update == "Quemah" ] ; then
-        echo "(Updating | Actualizando) via GIT ..."
-        git pull --recurse-submodules
-        git submodule update --remote
+        echo "(Updating | Actualizando) Esquite-Docker via GIT ..."
+        git pull 
+        echo "(Updating | Actualizando) Esquite Framework via GIT ..."
+        docker exec -ti $cnt_name_app sh -c "cd /home/elotl/Esquite && git pull "
         restart "app"
     else
         echo "[EN] Update confirmation unsuccesful. No updates have been applied"

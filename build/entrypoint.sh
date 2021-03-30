@@ -32,6 +32,7 @@ logMsg "############################################################"
 execCmd "sudo /bin/chown -R elotl:elotl $HOMEDIR/"
 logMsg "Permissions set to homedir (ensure perms in case volumes are used) ..."
 envupdate=0
+ls -l $ESQUITE_DIR
 if [ ! -f $ESQUITE_DIR/env.yaml ]; then
     logMsg "ENV file doesn't exist. New file will be created via wizard (quick)"
     execCmd "cd $ESQUITE_DIR/"
@@ -43,15 +44,21 @@ if [ ! -f $ESQUITE_DIR/env.yaml ]; then
     fi
     envupdate=1
 fi
-    logMsg "Testin Default INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
-    execCmd "sleep 10"
-    elastic-test="`curl -X GET \"esquite-elasticsearch:9200/default\"`"
-    if [ -z "$elastic_test" ]; then
-        logMsg "Default Index does not exist. Creating NEW index"
-        execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/default"
-    else
-        logMsg "Existing default index [default] exists."
-    fi
+env_hash="`md5sum $ESQUITE_DIR/env.yaml | awk '{print $1}'`"
+logMsg "ENV version: [$env_hash]"
+if [ $env_hash == "2daf0e0a68bc5e87d8c4f9b1e04f935b" ]; then
+    logMsg "ENV file is an empty template. Docker ENV vars will apply"
+    envupdate=1
+fi
+logMsg "Testing Default INDEX. Waiting 10 seconds for ELASTICSEARCH container ..."
+execCmd "sleep 10"
+elastic-test="`curl -X GET \"esquite-elasticsearch:9200/default\"`"
+if [ -z "$elastic_test" ]; then
+    logMsg "Default Index does not exist. Creating NEW index"
+    execCmd "curl -X PUT -H \"Content-Type: application/json\" -d @$ESQUITE_DOCKER_DIR/esquite-elasticsearch.json.template esquite-elasticsearch:9200/default"
+else
+    logMsg "Existing default index [default] exists."
+fi
 
 if [ ! -z "$CFG_CORPUS_ADMIN_ADMIN_PASS" ]; then
     logMsg "Setting new custom Corpus-admin password"
