@@ -32,7 +32,6 @@ logMsg "############################################################"
 execCmd "sudo /bin/chown -R elotl:elotl $HOMEDIR/"
 logMsg "Permissions set to homedir (ensure perms in case volumes are used) ..."
 envupdate=0
-ls -l $ESQUITE_DIR
 if [ ! -f $ESQUITE_DIR/env.yaml ]; then
     logMsg "ENV file doesn't exist. New file will be created via wizard (quick)"
     execCmd "cd $ESQUITE_DIR/"
@@ -45,7 +44,9 @@ if [ ! -f $ESQUITE_DIR/env.yaml ]; then
     envupdate=1
 fi
 env_hash="`md5sum $ESQUITE_DIR/env.yaml | awk '{print $1}'`"
-logMsg "ENV version: [$env_hash]"
+logMsg "Using ENV file version  : [$env_hash]"
+esquite_version="`cd $ESQUITE_DIR && git log | head -1 | awk '{print $2}'`"
+logMsg "Running Esquite version : [$esquite_version]"
 if [ $env_hash == "2daf0e0a68bc5e87d8c4f9b1e04f935b" ]; then
     logMsg "ENV file is an empty template. Docker ENV vars will apply"
     envupdate=1
