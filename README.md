@@ -1,5 +1,8 @@
 # Docker Image - Esquite Framework v0.3  
 
+*For Spanish version check `README-ES.md` file.
+(La versión de este README es español está disponible en el archivo `README-ES.md`)*
+
 ## Quick Start  
 
 Version 0.3 of `Esquite-docker` is simpler than v0.2.  
