@@ -80,7 +80,7 @@ start () {
         mkdir "$CWD/logs"
         touch "$CWD/logs/esquite-docker.log"
     fi
-    docker-compose up -d
+    docker compose up -d
     sleep 5
     get_info
     get_info

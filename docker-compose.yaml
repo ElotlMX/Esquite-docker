@@ -1,0 +1,55 @@
+services:
+  esquite:
+    image: elotlmx/esquite:poetry
+    hostname: elotl-esquite
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/esquite-user/env.yaml:/home/elotl/Esquite/env.yaml
+      - ${PWD}/esquite-user/media:/home/elotl/Esquite/media
+      - ${PWD}/esquite-user/static-user/:/home/elotl/Esquite/static/user
+      - ${PWD}/esquite-user/templates-user:/home/elotl/Esquite/templates/user
+      - ${PWD}/esquite-user/esquite-http-auth-users.pwd:/home/elotl/users.pwd
+      - ${PWD}/logs/esquite:/home/elotl/logs
+      - ${PWD}/logs/nginx:/var/log/nginx
+      - ${PWD}/build:/home/elotl/Esquite-docker/build
+      - ${PWD}/build/entrypoint.sh:/entrypoint-esquite.sh
+      - ${PWD}/build/esquite-nginx.conf.template:/etc/nginx/sites-available/default
+      - ${PWD}/build/esquite-elasticsearch.json.template:/home/elotl/Esquite/esquite-elasticsearch.json.template
+    networks:
+      - elotl-esquite-net
+
+# By default, Esquite will use the elasticesearch index from the container.
+# Use this setting for testing. Instead, it is recommended to use an external elasticesearch setup
+# You should configure the "env.yaml" with the URL of the production elasticsearch environment.
+# If this container is meant to be used in production, then please tune it accordingly.
+
+# Values:
+#     default-esquite: It will create a default index within the elasticsearch container
+#     custom: It will not create any index and it will always take the URL value within env.yaml
+#
+# NOTES: The env.yaml will ALWAYS have priority, therefore regardless what value is set on this flag, 
+# Esquite will try to connect to the defined value URL of env.yaml
+#
+ 
+    environment:
+      - CFG_ESQUITE_ELASTICSEARCH=default-esquite
+      #- CFG_ESQUITE_ELASTIC=eustom
+
+
+# Elasticsearch Container
+# Comment the following part to disable the DEBUG elasticsearch container. This is recommended only for testing
+  elasticsearch:
+    image: elasticsearch:7.10.1
+    hostname: esquite-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+    depends_on:
+      - "esquite"
+    networks:
+      - elotl-esquite-net
+
+networks:
+  elotl-esquite-net:
+    driver: bridge
+    name: elotl-esquite-net
